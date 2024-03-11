@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
 }
 
 class CounterPage extends StatelessWidget {
-  final _valueNotifier = ValueNotifier<int>(0);
+  final StreamController<int> _controller = StreamController<int>();
   CounterPage({super.key});
 
   @override
@@ -34,33 +34,38 @@ class CounterPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ValueListenableBuilder<int>(
-              valueListenable: _valueNotifier,
-              builder: (context, value, child) {
-                return Text(
-                  '$value',
-                  style: const TextStyle(fontSize: 24),
+            StreamBuilder<int>(
+              stream: _controller.stream,
+              initialData: 0,
+              builder: (context, snapshot) {
+                return Column(
+                  children: [
+                    Text(
+                      '${snapshot.data}',
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            _controller.add(snapshot.data! - 1);
+                          },
+                          child: const Text('Decrease'),
+                        ),
+                        const SizedBox(width: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            _controller.add(snapshot.data! + 1);
+                          },
+                          child: const Text('Increase'),
+                        ),
+                      ],
+                    ),
+                  ],
                 );
               },
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    _valueNotifier.value --;
-                  },
-                  child: const Text('Decrease'),
-                ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    _valueNotifier.value ++;
-                  },
-                  child: const Text('Increase'),
-                ),
-              ],
             ),
           ],
         ),
